@@ -1,108 +1,129 @@
-## 1. **Objective**
+# Email Deletifier - Product Idea
 
-* **Goal:** Automatically detect and mark advertising emails in your inbox for deletion.
-* **Scope:** No other email categorisation; only identify advertising (promotional, marketing, sales emails) and mark/delete them.
+## Overview
 
----
+Email Deletifier is a tool designed to help users manage their Gmail inbox by automatically identifying and handling advertising emails. It uses AI to classify emails and implements a smart labeling system to organize them without moving them from their original location.
 
-## 2. **System Overview**
+## Core Features
 
-* **Inputs:** Raw emails from your inbox (via IMAP/POP3 or API).
-* **Process:** AI model analyses each email, determines if it’s advertising.
-* **Outputs:** Advertising emails are marked (labelled, moved, or deleted as per setup).
+### 1. AI-Powered Email Classification
+- Uses OpenAI's GPT model to accurately identify advertising emails
+- Provides confidence scores for classification decisions
+- Processes emails in configurable batch sizes to prevent overload
 
----
+### 2. Smart Labeling System
+- Automatically adds "Advertising" label to identified advertising emails
+- Marks all processed emails with a "Processed" label
+- Keeps emails in their original location (INBOX)
+- Maintains email organization without disrupting existing folder structure
 
-## 3. **Key Components**
+### 3. Automated Cleanup
+- Configurable age threshold for deleting old advertising emails
+- Dry run mode for testing without actual deletions
+- Detailed logging of all actions and decisions
+- Batch processing to prevent server overload
 
-### 1. **Email Fetcher**
+### 4. Safety and Control
+- Dry run mode for testing and verification
+- Configurable deletion thresholds
+- Comprehensive logging system
+- Error handling and graceful disconnection
+- No permanent changes to email structure
 
-* Connects to your email provider (IMAP/POP3 or Gmail/Outlook API).
-* Downloads new/unread emails for processing.
+## Technical Implementation
 
-### 2. **Preprocessing Engine**
+### Email Processing
+1. **First Pass: Classification**
+   - Fetches unprocessed emails from INBOX
+   - Uses AI to classify each email
+   - Adds appropriate labels
+   - Keeps emails in original location
 
-* Extracts subject, sender, body, headers, and attachments.
-* Converts HTML to text for analysis.
+2. **Second Pass: Cleanup**
+   - Identifies old advertising emails
+   - Deletes based on configurable threshold
+   - Respects dry run mode settings
+   - Provides detailed action logging
 
-### 3. **AI Classifier**
+### Configuration Options
+- Batch size for processing
+- Maximum email age for processing
+- Deletion threshold for advertising emails
+- Dry run mode toggle
+- OpenAI API settings
 
-* Model (LLM or traditional ML) trained to spot advertising.
-* Features: sender reputation, keywords (“sale”, “offer”, “unsubscribe”), email structure, presence of tracking pixels, sender domain, etc.
+## User Benefits
 
-### 4. **Action Handler**
+1. **Time Savings**
+   - Automated processing of advertising emails
+   - No manual sorting required
+   - Efficient batch processing
 
-* If AI confidence > threshold, email is:
+2. **Organization**
+   - Clear labeling of advertising content
+   - Maintains original email location
+   - Easy to find and manage advertising emails
 
-  * Labelled as “To Delete”, or
-  * Moved to Trash/Deleted Items, or
-  * Flagged for review (optional, as a safety net).
+3. **Control**
+   - Configurable deletion thresholds
+   - Dry run mode for testing
+   - Detailed logging of all actions
+   - No permanent changes without verification
 
-### 5. **Audit Log (Optional)**
+4. **Safety**
+   - No permanent changes in dry run mode
+   - Configurable thresholds
+   - Detailed logging
+   - Error handling
 
-* Logs actions for transparency (helpful for tuning).
+## Future Enhancements
 
----
+1. **Additional Classification Categories**
+   - Expand beyond advertising emails
+   - Custom classification rules
+   - User-defined categories
 
-## 4. **Workflow Diagram**
+2. **Enhanced Configuration**
+   - Web interface for settings
+   - Scheduled runs
+   - Custom labeling rules
 
-```
-[Inbox] 
-   ↓
-[Fetcher] 
-   ↓
-[Preprocessor] 
-   ↓
-[AI Classifier] 
-   ↓
-[Is Advertising?] ——→ [Yes] → [Mark/Delete]
-                   ↓
-                  [No] → [Do Nothing]
-```
+3. **Advanced Features**
+   - Email content analysis
+   - Sender reputation tracking
+   - Custom action rules
+   - Integration with other email providers
 
----
+## Technical Requirements
 
-## 5. **Implementation Notes**
+- Node.js environment
+- Gmail account
+- OpenAI API key
+- Gmail App Password (if 2FA enabled)
 
-* **AI Model:**
+## Security Considerations
 
-  * Start with a simple model (e.g. fine-tuned BERT or use GPT with zero/few-shot prompts).
-  * Example prompt: “Is this email advertising/promotional? Reply YES or NO.”
-  * Improve with feedback loop.
+- Secure storage of credentials
+- API key management
+- No permanent changes in dry run mode
+- Detailed logging for audit trails
+- Error handling and recovery
 
-* **Tech Stack:**
+## Success Metrics
 
-  * Python (popular libraries: `imaplib`, `email`, `transformers`, `scikit-learn`).
-  * Cron job or daemon for regular checking.
-  * Use OAuth2 for secure API access.
+1. **Accuracy**
+   - Classification accuracy
+   - False positive/negative rates
+   - User feedback on classification
 
-* **Deletion Policy:**
+2. **Performance**
+   - Processing speed
+   - Resource usage
+   - Error rates
 
-  * *Mark for deletion first* (safer), then after review or X days, auto-delete.
-  * Optional: Whitelist important senders to prevent accidental deletion.
-
-* **Privacy:**
-
-  * Run locally, or on a secure server.
-  * Do not forward emails externally unless required for cloud AI.
-
----
-
-## 6. **Sample Minimal Python Flow**
-
-```python
-# Pseudocode for illustration
-for email in fetch_inbox():
-    subject, sender, body = extract(email)
-    if ai_model.predict_is_advertising(subject, sender, body):
-        mark_for_deletion(email)
-```
-
----
-
-## 7. **Future Enhancements**
-
-* Self-learning: Allow user to correct errors; system retrains.
-* Dashboard for reviewing flagged emails.
-* Multi-account support.
+3. **User Satisfaction**
+   - Time saved
+   - Organization improvement
+   - Control over process
+   - Safety features utilization
 

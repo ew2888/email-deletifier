@@ -143,23 +143,40 @@ interface ActionService {
    - Tracking pixel detection
 
 ### Action Handling
-1. **Deletion Strategy:**
-   - Two-phase deletion (mark then delete)
-   - Configurable delay between phases
-   - Whitelist override
-   - Age-based actions:
-     - Mark emails older than threshold
-     - Delete emails older than threshold
-     - Move emails older than threshold to specified folder
-   - Combined strategy (advertising + age)
+1. **Two-Stage Deletion Strategy:**
+   - Stage 1: Move to Advertising folder
+     - Emails identified as advertising are moved to a dedicated "Advertising" folder
+     - This happens immediately upon classification
+     - Users can review and move emails back if needed
+   
+   - Stage 2: Delete from Advertising folder
+     - Emails in the Advertising folder older than 60 days are automatically deleted
+     - This provides a 30-day grace period for review
+     - Deletion is permanent and cannot be undone
 
-2. **Audit System:**
-   - Detailed logging of all actions
-   - Classification confidence tracking
-   - Error reporting
-   - Performance metrics
-   - Age-based action logging
-   - Retention policy compliance tracking
+2. **Rolling Window Process:**
+   - Every 24 hours, the system:
+     1. Scans inbox for advertising emails
+     2. Moves identified advertising emails to Advertising folder
+     3. Deletes emails from Advertising folder that are >60 days old
+   
+   - Age-based actions:
+     - 0-30 days: Email remains in inbox
+     - 30-60 days: Email moves to Advertising folder
+     - >60 days: Email is deleted from Advertising folder
+
+3. **Folder Management:**
+   - System automatically creates "Advertising" folder if it doesn't exist
+   - Maintains folder structure across email providers
+   - Handles folder creation/migration gracefully
+   - Preserves folder hierarchy
+
+4. **Audit System:**
+   - Logs all folder movements
+   - Tracks email ages
+   - Records deletion actions
+   - Maintains history of user overrides
+   - Reports on folder statistics
 
 ## 4. Configuration
 
@@ -183,9 +200,18 @@ IMAP_PORT=993
 GMAIL_CLIENT_ID=****
 GMAIL_CLIENT_SECRET=****
 OPENAI_API_KEY=****
+OPENAI_MODEL=gpt-4.1-nano  # Options: gpt-4.1-nano, gpt-4-turbo-preview, gpt-4, gpt-3.5-turbo
 CLASSIFICATION_CONFIDENCE_THRESHOLD=0.85
-DELETION_DELAY_DAYS=7
-MAX_EMAIL_AGE_DAYS=30  # Only process emails newer than this
+
+# Folder and Age Management
+ADVERTISING_FOLDER_NAME=Advertising
+MOVE_TO_ADVERTISING_DAYS=30
+DELETE_FROM_ADVERTISING_DAYS=60
+CHECK_FREQUENCY_HOURS=24
+
+# Processing Limits
+MAX_EMAILS_PER_BATCH=100
+MAX_PROCESSING_TIME_MINUTES=30
 ```
 
 ### User Settings
