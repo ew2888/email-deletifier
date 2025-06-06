@@ -1,112 +1,144 @@
 # Email Deletifier
 
-A Node.js application that automatically processes and manages your Gmail inbox by identifying and handling advertising emails.
+A Node.js tool that uses AI to automatically identify and manage advertising emails in your Gmail inbox. It uses Gmail labels to organize emails without moving them from their original location, making it safe and non-disruptive to your existing email organization.
 
 ## Features
 
-- **AI-Powered Classification**: Uses OpenAI's GPT model to accurately identify advertising emails
-- **Gmail Integration**: Works directly with your Gmail account using IMAP
-- **Smart Labeling**: Automatically labels emails as "Advertising" or "Processed"
-- **Configurable Cleanup**: Automatically deletes old advertising emails based on configurable thresholds
-- **Dry Run Mode**: Test the script without actually deleting any emails
-- **Detailed Logging**: Comprehensive logging of all actions and decisions
+- 🤖 AI-powered email classification using OpenAI's GPT model
+- 🏷️ Smart labeling system (keeps emails in INBOX)
+- 🔄 Two-pass system (classification and cleanup)
+- 🛡️ Dry run mode for safe testing
+- 📊 Detailed logging of all actions
+- ⚙️ Configurable settings
+- 🔒 Secure credential management
 
 ## Prerequisites
 
 - Node.js (v14 or higher)
-- A Gmail account
+- Gmail account
 - OpenAI API key
 - Gmail App Password (if 2FA is enabled)
 
 ## Installation
 
 1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/email-deletifier.git
-cd email-deletifier
-```
+   ```bash
+   git clone https://github.com/yourusername/email-deletifier.git
+   cd email-deletifier
+   ```
 
 2. Install dependencies:
-```bash
-npm install
-```
+   ```bash
+   npm install
+   ```
 
-3. Create a `.env` file in the root directory with the following variables:
-```env
-GMAIL_USER=your.email@gmail.com
-GMAIL_PASSWORD=your-app-password
-OPENAI_API_KEY=your-openai-api-key
-DELETE_FROM_ADVERTISING_DAYS=60  # Optional: Days after which to delete advertising emails (default: 60)
-DRY_RUN=true  # Optional: Set to 'true' to test without deleting emails (default: false)
-```
+3. Create a `.env` file:
+   ```bash
+   cp .env.example .env
+   ```
 
-## Configuration
-
-The following environment variables can be configured in your `.env` file:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `GMAIL_USER` | Your Gmail email address | Required |
-| `GMAIL_PASSWORD` | Your Gmail app password | Required |
-| `OPENAI_API_KEY` | Your OpenAI API key | Required |
-| `DELETE_FROM_ADVERTISING_DAYS` | Age threshold (in days) for deleting advertising emails | 60 |
-| `DRY_RUN` | If 'true', runs in simulation mode without deleting emails | false |
-
-## How It Works
-
-The script operates in two passes:
-
-### First Pass: Email Classification
-1. Fetches unprocessed emails from your Gmail INBOX
-2. Uses OpenAI to classify each email as advertising or not
-3. Adds appropriate labels:
-   - "Advertising" label for advertising emails
-   - "Processed" label for all processed emails
-4. Keeps all emails in their original location
-
-### Second Pass: Cleanup
-1. Checks the "Advertising" folder for old emails
-2. Deletes advertising emails older than the configured threshold
-3. Skips deletion if in dry run mode
-4. Provides detailed logging of all actions
+4. Edit `.env` with your credentials:
+   ```
+   GMAIL_USER=your.email@gmail.com
+   GMAIL_PASSWORD=your-app-password
+   OPENAI_API_KEY=your-openai-api-key
+   DELETE_FROM_ADVERTISING_DAYS=60
+   DRY_RUN=true
+   ```
 
 ## Usage
 
-Run the script:
-```bash
-npx ts-node src/main.ts
-```
+1. Start the application:
+   ```bash
+   ./start.sh
+   ```
 
-The script will:
-1. Connect to your Gmail account
-2. Create necessary labels if they don't exist
-3. Process unprocessed emails in batches
-4. Clean up old advertising emails
-5. Provide a detailed summary of actions taken
+   Or manually:
+   ```bash
+   npx ts-node src/main.ts
+   ```
 
-## Logging
+2. The script will:
+   - Process unlabeled emails in your INBOX
+   - Classify them using AI
+   - Add appropriate labels
+   - Optionally delete old advertising emails
 
-The script provides detailed logging of:
-- Configuration settings
-- Connection status
-- Email processing decisions
-- Classification results
-- Label application status
-- Deletion actions
-- Summary statistics
+## Configuration
+
+The following environment variables can be configured in `.env`:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `GMAIL_USER` | Your Gmail address | - |
+| `GMAIL_PASSWORD` | Gmail App Password | - |
+| `OPENAI_API_KEY` | OpenAI API key | - |
+| `DELETE_FROM_ADVERTISING_DAYS` | Age threshold for deletion | 60 |
+| `DRY_RUN` | Enable dry run mode | true |
+| `BATCH_SIZE` | Number of emails to process at once | 10 |
+| `MAX_EMAIL_AGE_DAYS` | Maximum age of emails to process | 90 |
 
 ## Safety Features
 
-- Dry run mode for testing without actual deletions
-- Configurable deletion threshold
-- Detailed logging of all actions
-- Batch processing to prevent overload
-- Error handling and graceful disconnection
+- **Dry Run Mode**: When enabled (`DRY_RUN=true`), no emails will be deleted
+- **Labeling**: Emails are labeled rather than moved, preserving your organization
+- **Detailed Logging**: All actions are logged for review
+- **Error Handling**: Graceful error recovery and disconnection
+- **Batch Processing**: Prevents server overload
+
+## How It Works
+
+1. **First Pass: Classification**
+   - Fetches unprocessed emails from INBOX
+   - Uses AI to classify each email
+   - Adds "Advertising" label to identified ads
+   - Marks all processed emails with "Processed" label
+
+2. **Second Pass: Cleanup**
+   - Identifies old advertising emails
+   - Deletes based on configurable threshold
+   - Respects dry run mode settings
+   - Provides detailed action logging
+
+## Development
+
+### Project Structure
+
+```
+email-deletifier/
+├── src/
+│   ├── main.ts           # Main application entry
+│   ├── gmail.ts          # Gmail API integration
+│   ├── classifier.ts     # AI classification logic
+│   └── tests/            # Test files
+├── .env                  # Configuration
+├── .env.example         # Example configuration
+├── start.sh             # Startup script
+└── package.json         # Dependencies
+```
+
+### Running Tests
+
+```bash
+npx ts-node src/tests/test-classifier.ts
+npx ts-node src/tests/test-gmail.ts
+npx ts-node src/tests/test-folder.ts
+```
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- OpenAI for providing the GPT API
+- Gmail API for email management capabilities
+- Node.js community for excellent tooling 
