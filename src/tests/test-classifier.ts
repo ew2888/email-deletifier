@@ -1,5 +1,5 @@
-import { OpenAIClassifier } from './services/classifier/OpenAIClassifier';
-import { Email } from './services/email/ImapService';
+import { OpenAIClassifier } from '../services/classifier/OpenAIClassifier';
+import { Email } from '../services/email/ImapService';
 import dotenv from 'dotenv';
 
 // Load environment variables

@@ -1,4 +1,4 @@
-import { ImapService } from './services/email/ImapService';
+import { ImapService } from '../services/email/ImapService';
 
 async function testGmailConnection() {
   const imapService = new ImapService();

@@ -1,4 +1,4 @@
-import { ImapService } from './services/email/ImapService';
+import { ImapService } from '../services/email/ImapService';
 import dotenv from 'dotenv';
 
 // Load environment variables
